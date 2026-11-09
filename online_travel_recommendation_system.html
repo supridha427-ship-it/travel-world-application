@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelAI - Personalized Travel Recommendation System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Glassmorphism effects */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="font-sans h-full min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="scrollToTop()">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                        <i class="fa-solid font-bold fa-compass text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-brand-400">TravelAI</span>
+                        <span class="hidden sm:inline-block text-xs text-slate-400 ml-2 px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700">AIML Powered</span>
+                    </div>
+                </div>
+
+                <!-- Nav Badges -->
+                <div class="flex items-center space-x-4">
+                    <a href="#recommend-section" class="text-xs sm:text-sm font-medium text-slate-300 hover:text-brand-400 transition-colors">Find Trip</a>
+                    <a href="#history-section" class="text-xs sm:text-sm font-medium text-slate-300 hover:text-brand-400 transition-colors">History & Stats</a>
+                    <div class="bg-brand-500/10 border border-brand-500/30 px-3 py-1 rounded-full text-xs text-brand-400 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
+                        <span>Hybrid Engine</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+
+        <!-- Hero & Controls Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Hero Info (Left 5 Cols) -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs">
+                    <i class="fa-solid fa-wand-magic-sparkles text-brand-400"></i> Smart Recommendation Engine
+                </div>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                    Discover Your Next <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-cyan-400">Perfect Trip</span>
+                </h1>
+                <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+                    Say goodbye to hours of manual planning. Our hybrid recommendation system combines user preference matching and collaborative ratings to calculate tailor-made travel destinations within your exact budget.
+                </p>
+
+                <!-- System Stats Quick Glance -->
+                <div class="grid grid-cols-3 gap-4 pt-2">
+                    <div class="glass-card p-3 rounded-xl border border-slate-800 text-center">
+                        <p class="text-2xl font-bold text-brand-400" id="totalDestinationsCount">12</p>
+                        <p class="text-xs text-slate-400">Destinations</p>
+                    </div>
+                    <div class="glass-card p-3 rounded-xl border border-slate-800 text-center">
+                        <p class="text-2xl font-bold text-cyan-400" id="avgSystemRating">4.3★</p>
+                        <p class="text-xs text-slate-400">Avg Saved Rating</p>
+                    </div>
+                    <div class="glass-card p-3 rounded-xl border border-slate-800 text-center">
+                        <p class="text-2xl font-bold text-amber-400" id="userTripCount">0</p>
+                        <p class="text-xs text-slate-400">Saved Trips</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preference Form Panel (Right 7 Cols) -->
+            <div id="recommend-section" class="lg:col-span-7 glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl border border-slate-700/50 relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-48 h-48 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-sliders fa-solid text-brand-400"></i> Preference Parameters
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">Configure your budget and travel preferences</p>
+                    </div>
+                    <button onclick="resetFilters()" class="text-xs text-slate-400 hover:text-white underline">Reset</button>
+                </div>
+
+                <form id="preferenceForm" class="space-y-6" onsubmit="event.preventDefault(); generateRecommendation();">
+                    
+                    <!-- Budget Slider & Input -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                                <i class="fa-indian-rupee-sign fa-solid text-slate-400"></i> Max Budget (INR)
+                            </label>
+                            <span class="text-brand-400 font-bold text-lg" id="budgetValueDisplay">₹ 20,000</span>
+                        </div>
+                        <input type="range" id="budgetRange" min="1500" max="30000" step="500" value="20000"
+                               class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-500"
+                               oninput="updateBudgetDisplay(this.value)">
+                        <div class="flex justify-between text-xs text-slate-500 mt-1">
+                            <span>₹ 1,500</span>
+                            <span>₹ 15,000</span>
+                            <span>₹ 30,000+</span>
+                        </div>
+                    </div>
+
+                    <!-- Interest Type Selection -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-200 mb-2">
+                            <i class="fa-heart fa-solid text-slate-400 mr-1"></i> Preferred Interest
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <label class="interest-btn flex flex-col items-center justify-center p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer hover:border-brand-500 transition-all text-slate-300">
+                                <input type="radio" name="interest" value="beach" class="hidden" checked onchange="updateInterestStyles()">
+                                <i class="fa-umbrella-beach text-xl mb-1 text-teal-400"></i>
+                                <span class="text-xs font-medium">Beach</span>
+                            </label>
+
+                            <label class="interest-btn flex flex-col items-center justify-center p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer hover:border-brand-500 transition-all text-slate-300">
+                                <input type="radio" name="interest" value="hills" class="hidden" onchange="updateInterestStyles()">
+                                <i class="fa-mountain text-xl mb-1 text-emerald-400"></i>
+                                <span class="text-xs font-medium">Hills</span>
+                            </label>
+
+                            <label class="interest-btn flex flex-col items-center justify-center p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer hover:border-brand-500 transition-all text-slate-300">
+                                <input type="radio" name="interest" value="history" class="hidden" onchange="updateInterestStyles()">
+                                <i class="fa-landmark text-xl mb-1 text-amber-400"></i>
+                                <span class="text-xs font-medium">History</span>
+                            </label>
+
+                            <label class="interest-btn flex flex-col items-center justify-center p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer hover:border-brand-500 transition-all text-slate-300">
+                                <input type="radio" name="interest" value="all" class="hidden" onchange="updateInterestStyles()">
+                                <i class="fa-compass text-xl mb-1 text-cyan-400"></i>
+                                <span class="text-xs font-medium">Any Interest</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Additional Filters (Duration & Travel Style) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Trip Duration</label>
+                            <select id="durationSelect" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                                <option value="2">2 Days / 1 Night</option>
+                                <option value="3" selected>3 Days / 2 Nights</option>
+                                <option value="5">5 Days / 4 Nights</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Traveler Type</label>
+                            <select id="travelerType" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                                <option value="solo">Solo Travel</option>
+                                <option value="couple" selected>Couple / Friends</option>
+                                <option value="family">Family Trip</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-600 hover:from-brand-500 hover:to-cyan-500 text-white font-bold text-sm shadow-lg shadow-brand-600/30 transition-all flex items-center justify-center gap-2 group">
+                        <span>Get Personalized Recommendation</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Recommendation Display Section -->
+        <section id="resultsContainer" class="hidden space-y-8 scroll-mt-20">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-sparkles text-amber-400"></i> Recommended Destination
+                    </h2>
+                    <p class="text-sm text-slate-400">Matched using user collaborative data & places dataset</p>
+                </div>
+                <span id="matchBadge" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-semibold">
+                    100% Match
+                </span>
+            </div>
+
+            <!-- Primary Recommended Destination Card -->
+            <div class="glass-panel rounded-2xl overflow-hidden border border-brand-500/30 shadow-2xl grid grid-cols-1 lg:grid-cols-12">
+                
+                <!-- Destination Visual Header -->
+                <div class="lg:col-span-5 relative min-h-[250px] lg:min-h-full bg-slate-800 flex flex-col justify-between p-6 overflow-hidden">
+                    <div id="destCardBg" class="absolute inset-0 bg-cover bg-center opacity-40 transition-all duration-700"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent"></div>
+
+                    <!-- Top Overlay Info -->
+                    <div class="relative z-10 flex justify-between items-start">
+                        <span id="destTypeTag" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-500/80 text-white backdrop-blur-md">
+                            Beach
+                        </span>
+                        <div class="flex items-center gap-1 bg-slate-900/80 px-2.5 py-1 rounded-full text-amber-400 text-xs font-bold border border-slate-700">
+                            <i class="fa-solid fa-star"></i>
+                            <span id="destCollaborativeRating">4.5</span>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Title Block -->
+                    <div class="relative z-10 space-y-1">
+                        <h3 class="text-3xl font-extrabold text-white" id="destName">Kerala</h3>
+                        <p class="text-sm text-slate-300 flex items-center gap-1" id="destLocation">
+                            <i class="fa-solid fa-location-dot text-brand-400"></i> Kerala, India
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Destination Details & Itinerary -->
+                <div class="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                            <div>
+                                <span class="text-xs text-slate-500 block">Avg Estimated Cost</span>
+                                <span class="text-lg font-bold text-emerald-400" id="destAvgCost">₹ 20,000</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 block">Category</span>
+                                <span class="text-sm font-semibold text-slate-200 capitalize" id="destCategory">Beach</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 block">Budget Fit</span>
+                                <span class="text-sm font-semibold text-brand-400" id="destBudgetFit">Within Budget</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-sm font-semibold text-slate-300 mb-2">Suggested Day-wise Itinerary</h4>
+                            <div class="space-y-2" id="itineraryContainer">
+                                <!-- Dynamic Itinerary Items inserted by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Rating & Feedback Box (Prompting Python Output Simulation) -->
+                    <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Rate This Recommendation</h4>
+                                <p class="text-xs text-slate-400">Simulates input saving into <code class="text-brand-400 font-mono text-[11px]">travel_history.txt</code></p>
+                            </div>
+                            <!-- Star Rating Controls -->
+                            <div class="flex items-center space-x-1" id="starRatingBox">
+                                <button onclick="setRating(1)" class="star-btn text-slate-600 hover:text-amber-400 text-lg transition-colors"><i class="fa-solid fa-star"></i></button>
+                                <button onclick="setRating(2)" class="star-btn text-slate-600 hover:text-amber-400 text-lg transition-colors"><i class="fa-solid fa-star"></i></button>
+                                <button onclick="setRating(3)" class="star-btn text-slate-600 hover:text-amber-400 text-lg transition-colors"><i class="fa-solid fa-star"></i></button>
+                                <button onclick="setRating(4)" class="star-btn text-slate-600 hover:text-amber-400 text-lg transition-colors"><i class="fa-solid fa-star"></i></button>
+                                <button onclick="setRating(5)" class="star-btn text-slate-600 hover:text-amber-400 text-lg transition-colors"><i class="fa-solid fa-star"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <button onclick="submitUserRating()" id="saveRatingBtn" class="w-full py-2 px-4 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> Submit Rating & Save Record
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alternative Recommendations Grid -->
+            <div>
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-brand-400"></i> Other Top Matching Places
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="alternativeDestinationsGrid">
+                    <!-- Dynamic Alternatives Card insertion -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Travel History & Stats Dashboard Section -->
+        <section id="history-section" class="glass-panel rounded-2xl p-6 sm:p-8 border border-slate-800 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-brand-400"></i> Travel Recommendation History
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Persisted user history (Simulating backend file <code class="text-brand-400 font-mono">travel_history.txt</code>)
+                    </p>
+                </div>
+
+                <!-- Live Calculated Average Rating Box -->
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 px-4 py-2 rounded-xl flex items-center gap-3">
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400 block font-medium">Average Rating of All Records</span>
+                        <span id="avgHistoryRatingText" class="text-base font-extrabold text-amber-400">4.3 / 5.0</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400 text-lg">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table of Saved Records -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs sm:text-sm text-slate-300">
+                    <thead class="text-xs uppercase bg-slate-900/80 text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th scope="col" class="px-4 py-3">Place</th>
+                            <th scope="col" class="px-4 py-3">Budget</th>
+                            <th scope="col" class="px-4 py-3">Interest Type</th>
+                            <th scope="col" class="px-4 py-3">User Rating</th>
+                            <th scope="col" class="px-4 py-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody" class="divide-y divide-slate-800">
+                        <!-- Dynamic Records -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="flex justify-between items-center pt-2">
+                <span class="text-xs text-slate-500" id="recordCountText">Showing 3 records</span>
+                <button onclick="clearHistory()" class="text-xs text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1">
+                    <i class="fa-solid fa-trash-can"></i> Clear History
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-6 text-center text-xs text-slate-500 space-y-2">
+        <p>Online Travelling Recommendation System &bull; AIML Department Project</p>
+        <p class="text-slate-600">Built with Hybrid Filtering (Content + Collaborative) and Web UI Architecture</p>
+    </footer>
+
+    <!-- Toast Notification Box -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel border border-brand-500 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50">
+        <i class="fa-circle-check fa-solid text-brand-400 text-lg"></i>
+        <span id="toastMsg" class="text-xs font-semibold">Recommendation saved to history!</span>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // ==========================================
+        // DATASETS (From Project Slides & Datasets)
+        // ==========================================
+        const placesDataset = [
+            { place: "Yercaud", type: "hills", state: "Tamil Nadu", avg_cost: 4000, img: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80" },
+            { place: "Ooty", type: "hills", state: "Tamil Nadu", avg_cost: 6000, img: "https://images.unsplash.com/photo-1589136777351-fdc9c9cab193?auto=format&fit=crop&w=600&q=80" },
+            { place: "Kodaikanal", type: "hills", state: "Tamil Nadu", avg_cost: 4500, img: "https://images.unsplash.com/photo-1596402184320-417e7178b2cd?auto=format&fit=crop&w=600&q=80" },
+            { place: "Munnar", type: "hills", state: "Kerala", avg_cost: 7000, img: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=600&q=80" },
+            { place: "Pondicherry", type: "beach", state: "Puducherry", avg_cost: 3500, img: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=600&q=80" },
+            { place: "Goa", type: "beach", state: "Goa", avg_cost: 8000, img: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80" },
+            { place: "Marina Beach", type: "beach", state: "Tamil Nadu", avg_cost: 1500, img: "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&w=600&q=80" },
+            { place: "Kovalam", type: "beach", state: "Kerala", avg_cost: 6500, img: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=600&q=80" },
+            { place: "Kerala", type: "beach", state: "Kerala", avg_cost: 20000, img: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=600&q=80" },
+            { place: "Mahabalipuram", type: "history", state: "Tamil Nadu", avg_cost: 3000, img: "https://images.unsplash.com/photo-1621831971772-e8c17b6a0319?auto=format&fit=crop&w=600&q=80" },
+            { place: "Madurai", type: "history", state: "Tamil Nadu", avg_cost: 3500, img: "https://images.unsplash.com/photo-1627894483216-2138af692e32?auto=format&fit=crop&w=600&q=80" },
+            { place: "Mysore", type: "history", state: "Karnataka", avg_cost: 6000, img: "https://images.unsplash.com/photo-1600100397608-f010e423b971?auto=format&fit=crop&w=600&q=80" },
+            { place: "Jaipur", type: "history", state: "Rajasthan", avg_cost: 9000, img: "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=600&q=80" }
+        ];
+
+        // Collaborative ratings dataset (from slides)
+        const ratingsDataset = [
+            { user: "Arun", place: "Kodaikanal", rating: 5 },
+            { user: "Arun", place: "Madurai", rating: 4 },
+            { user: "Arun", place: "Ooty", rating: 5 },
+            { user: "Arun", place: "Pondicherry", rating: 2 },
+            { user: "Arun", place: "Mysore", rating: 4 },
+            { user: "Arun", place: "Munnar", rating: 4 },
+            { user: "Arun", place: "Marina Beach", rating: 4 },
+            { user: "Bala", place: "Marina Beach", rating: 4 },
+            { user: "Bala", place: "Madurai", rating: 3 },
+            { user: "Bala", place: "Yercaud", rating: 2 },
+            { user: "Bala", place: "Kovalam", rating: 4 },
+            { user: "Bala", place: "Pondicherry", rating: 4 },
+            { user: "Bala", place: "Goa", rating: 4 },
+            { user: "Bala", place: "Ooty", rating: 4 },
+            { user: "Chitra", place: "Mysore", rating: 5 }
+        ];
+
+        // Initial Saved History (Simulating travel_history.txt)
+        let travelHistory = [
+            { place: "Pondicherry", budget: 3000, interest: "beach", rating: 4 },
+            { place: "Yercaud", budget: 4000, interest: "hills", rating: 5 },
+            { place: "Kerala", budget: 20000, interest: "beach", rating: 4 }
+        ];
+
+        // State variables
+        let selectedUserRating = 0;
+        let currentActiveRecommendation = null;
+
+        // Initialize App
+        window.onload = function() {
+            updateInterestStyles();
+            renderHistoryTable();
+            calculateCollaborativeRatings();
+        };
+
+        // Update Slider Display Value
+        function updateBudgetDisplay(val) {
+            document.getElementById("budgetValueDisplay").innerText = `₹ ${parseInt(val).toLocaleString()}`;
+        }
+
+        // Handle Radio Styling
+        function updateInterestStyles() {
+            const radios = document.getElementsByName('interest');
+            radios.forEach(radio => {
+                const parent = radio.closest('.interest-btn');
+                if (radio.checked) {
+                    parent.classList.add('border-brand-500', 'bg-brand-500/10', 'text-brand-400');
+                    parent.classList.remove('border-slate-700', 'bg-slate-800/60', 'text-slate-300');
+                } else {
+                    parent.classList.remove('border-brand-500', 'bg-brand-500/10', 'text-brand-400');
+                    parent.classList.add('border-slate-700', 'bg-slate-800/60', 'text-slate-300');
+                }
+            });
+        }
+
+        // Reset Filter form
+        function resetFilters() {
+            document.getElementById("budgetRange").value = 20000;
+            updateBudgetDisplay(20000);
+            const radios = document.getElementsByName('interest');
+            radios[0].checked = true;
+            updateInterestStyles();
+        }
+
+        // Calculate Average Rating per Place from Collaborative Dataset
+        function getAverageCollaborativeRating(placeName) {
+            const matches = ratingsDataset.filter(r => r.place.toLowerCase() === placeName.toLowerCase());
+            if (matches.length === 0) return 4.2; // Default rating score fallback
+            const sum = matches.reduce((acc, curr) => acc + curr.rating, 0);
+            return (sum / matches.length).toFixed(1);
+        }
+
+        // HYBRID RECOMMENDATION ENGINE LOGIC
+        function generateRecommendation() {
+            const maxBudget = parseInt(document.getElementById("budgetRange").value);
+            const selectedInterestRadio = document.querySelector('input[name="interest"]:checked');
+            const interest = selectedInterestRadio ? selectedInterestRadio.value : "beach";
+
+            // Filter Candidates by Budget & Interest
+            let candidatePlaces = placesDataset.filter(item => {
+                const matchesBudget = item.avg_cost <= maxBudget;
+                const matchesInterest = interest === "all" || item.type.toLowerCase() === interest.toLowerCase();
+                return matchesBudget && matchesInterest;
+            });
+
+            // Fallback if no exact match in budget: relax budget requirement slightly
+            if (candidatePlaces.length === 0) {
+                candidatePlaces = placesDataset.filter(item => {
+                    return interest === "all" || item.type.toLowerCase() === interest.toLowerCase();
+                });
+            }
+
+            // Score candidate places based on Collaborative Rating & Budget Efficiency
+            candidatePlaces.forEach(place => {
+                const rating = parseFloat(getAverageCollaborativeRating(place.place));
+                const budgetRatio = place.avg_cost / maxBudget;
+                // Score = 70% collaborative rating + 30% budget proximity score
+                place.calculatedScore = (rating * 0.7) + ((1 - Math.min(budgetRatio, 1)) * 1.5);
+            });
+
+            // Sort by calculated score descending
+            candidatePlaces.sort((a, b) => b.calculatedScore - a.calculatedScore);
+
+            const topRecommendation = candidatePlaces[0] || placesDataset[0];
+            const alternatives = candidatePlaces.slice(1, 4);
+
+            currentActiveRecommendation = topRecommendation;
+            displayRecommendation(topRecommendation, alternatives, maxBudget, interest);
+        }
+
+        // Render Recommendation UI
+        function displayRecommendation(top, alternatives, maxBudget, userInterest) {
+            const resultsSection = document.getElementById("resultsContainer");
+            resultsSection.classList.remove("hidden");
+
+            // Fill main card
+            document.getElementById("destName").innerText = top.place;
+            document.getElementById("destLocation").innerText = `${top.place}, ${top.state}`;
+            document.getElementById("destCategory").innerText = top.type;
+            document.getElementById("destTypeTag").innerText = top.type;
+            document.getElementById("destAvgCost").innerText = `₹ ${top.avg_cost.toLocaleString()}`;
+            document.getElementById("destCollaborativeRating").innerText = `${getAverageCollaborativeRating(top.place)}★`;
+            document.getElementById("destCardBg").style.backgroundImage = `url('${top.img}')`;
+
+            const fitText = top.avg_cost <= maxBudget ? "Within Budget" : "Slightly Exceeds Budget";
+            const fitElement = document.getElementById("destBudgetFit");
+            fitElement.innerText = fitText;
+            fitElement.className = top.avg_cost <= maxBudget ? "text-sm font-semibold text-brand-400" : "text-sm font-semibold text-amber-400";
+
+            // Generate Day-wise Itinerary
+            renderItinerary(top);
+
+            // Render Alternative Suggestions Grid
+            renderAlternatives(alternatives);
+
+            // Reset Star Selection
+            setRating(4);
+
+            // Scroll Smoothly to Results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Render Day-Wise Itinerary
+        function renderItinerary(place) {
+            const container = document.getElementById("itineraryContainer");
+            const duration = parseInt(document.getElementById("durationSelect").value);
+            
+            let html = "";
+            const activitiesMap = {
+                beach: [
+                    "Morning Beach Walk & Local Sunrise Views",
+                    "Water Sports / Promenade Explorations & Coastal Seafood",
+                    "Sunset Viewpoint & Relaxing Beachside Lounge"
+                ],
+                hills: [
+                    "Scenic Mountain Trail & Botanical Gardens",
+                    "Boating in Lake & Viewpoint Trekking",
+                    "Local Tea/Coffee Plantation Tour & Souvenir Shopping"
+                ],
+                history: [
+                    "Guided Heritage & Ancient Architecture Tour",
+                    "Museum Visit & Traditional Craft Shopping",
+                    "Cultural Light & Sound Show at Monument Site"
+                ]
+            };
+
+            const activities = activitiesMap[place.type] || activitiesMap.beach;
+
+            for (let day = 1; day <= duration; day++) {
+                const activity = activities[(day - 1) % activities.length];
+                html += `
+                    <div class="flex items-start gap-3 p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/60">
+                        <div class="w-6 h-6 rounded-full bg-brand-500/20 border border-brand-500/40 text-brand-400 font-bold text-xs flex items-center justify-center shrink-0">
+                            D${day}
+                        </div>
+                        <p class="text-xs text-slate-300 font-medium pt-0.5">${activity}</p>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        // Render Alternatives Cards
+        function renderAlternatives(alternatives) {
+            const grid = document.getElementById("alternativeDestinationsGrid");
+            if (!alternatives || alternatives.length === 0) {
+                grid.innerHTML = `<p class="text-xs text-slate-500 col-span-3">No other matching destinations found for current filter.</p>`;
+                return;
+            }
+
+            grid.innerHTML = alternatives.map(item => `
+                <div class="glass-card rounded-xl p-4 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-white text-base">${item.place}</h4>
+                            <span class="text-xs text-slate-400">${item.state}</span>
+                        </div>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-800 text-brand-400 uppercase border border-slate-700">${item.type}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Est Cost: <strong class="text-slate-200">₹ ${item.avg_cost.toLocaleString()}</strong></span>
+                        <span class="text-amber-400 font-bold"><i class="fa-solid fa-star"></i> ${getAverageCollaborativeRating(item.place)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Star Rating Selection logic
+        function setRating(rating) {
+            selectedUserRating = rating;
+            const stars = document.querySelectorAll("#starRatingBox .star-btn");
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove("text-slate-600");
+                    star.classList.add("text-amber-400");
+                } else {
+                    star.classList.remove("text-amber-400");
+                    star.classList.add("text-slate-600");
+                }
+            });
+        }
+
+        // Submit Rating & Append to History
+        function submitUserRating() {
+            if (!currentActiveRecommendation) return;
+
+            const selectedInterestRadio = document.querySelector('input[name="interest"]:checked');
+            const currentInterest = selectedInterestRadio ? selectedInterestRadio.value : currentActiveRecommendation.type;
+
+            const newRecord = {
+                place: currentActiveRecommendation.place,
+                budget: parseInt(document.getElementById("budgetRange").value),
+                interest: currentInterest,
+                rating: selectedUserRating
+            };
+
+            // Add record to simulated history
+            travelHistory.unshift(newRecord);
+
+            // Re-render table & metrics
+            renderHistoryTable();
+
+            // Show Toast
+            showToast(`Saved ${newRecord.place} rating (${newRecord.rating}★) to history!`);
+        }
+
+        // Render History Table & Compute Average Rating
+        function renderHistoryTable() {
+            const tableBody = document.getElementById("historyTableBody");
+            
+            if (travelHistory.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-4 py-4 text-center text-xs text-slate-500">No saved history records found.</td></tr>`;
+                document.getElementById("avgHistoryRatingText").innerText = `0.0 / 5.0`;
+                document.getElementById("userTripCount").innerText = "0";
+                document.getElementById("recordCountText").innerText = `Showing 0 records`;
+                return;
+            }
+
+            tableBody.innerHTML = travelHistory.map((item, index) => `
+                <tr class="hover:bg-slate-800/40 transition-colors">
+                    <td class="px-4 py-3 font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-brand-400"></i> ${item.place}
+                    </td>
+                    <td class="px-4 py-3 text-slate-300">₹ ${item.budget.toLocaleString()}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-0.5 rounded text-xs bg-slate-800 border border-slate-700 capitalize text-slate-300">${item.interest}</span>
+                    </td>
+                    <td class="px-4 py-3 text-amber-400 font-bold">
+                        ${item.rating} ★
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="deleteHistoryRecord(${index})" class="text-slate-500 hover:text-rose-400 transition-colors">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Calculate overall history average rating
+            const sumRatings = travelHistory.reduce((acc, curr) => acc + curr.rating, 0);
+            const avgRating = (sumRatings / travelHistory.length).toFixed(1);
+            
+            document.getElementById("avgHistoryRatingText").innerText = `${avgRating} / 5.0`;
+            document.getElementById("avgSystemRating").innerText = `${avgRating}★`;
+            document.getElementById("userTripCount").innerText = travelHistory.length;
+            document.getElementById("recordCountText").innerText = `Showing ${travelHistory.length} saved records`;
+        }
+
+        // Delete single record
+        function deleteHistoryRecord(index) {
+            travelHistory.splice(index, 1);
+            renderHistoryTable();
+            showToast("Record removed from history");
+        }
+
+        // Clear all history
+        function clearHistory() {
+            travelHistory = [];
+            renderHistoryTable();
+            showToast("Travel history cleared");
+        }
+
+        // Toast Helper
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            document.getElementById("toastMsg").innerText = message;
+            toast.classList.remove("translate-y-20", "opacity-0");
+            toast.classList.add("translate-y-0", "opacity-100");
+            setTimeout(() => {
+                toast.classList.remove("translate-y-0", "opacity-100");
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 3000);
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
